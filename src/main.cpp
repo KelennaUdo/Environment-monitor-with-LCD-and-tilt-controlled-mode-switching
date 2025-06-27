@@ -1,13 +1,35 @@
 #include <Arduino.h>
-#include <accelerometer.h>
+#include <accelerometer/accelerometer.h>
 #include <Wire.h>
-
+#include <./mode_switch/mode_switch.h>
 
 Accelerometer accelerometer;
 void setup() {
   Serial.begin(9600);
+  // Initialize the accelerometer
+  accelerometer.initialize(SCALE_2G, ODR_200);
+  modeSwitchBegin(); // Initialize the mode switch
+}
 
-  // I2C Scanner
+void loop() {
+  accelerometer.read_if_available(); // Read accelerometer data if available
+   updateModeSwitch(accelerometer.getOrientation()); // Update the mode switch based on orientation
+
+    switch (currentMode())
+    {
+        case TEMP:     Serial.println("/* display temperature */"); break;
+        case HUMIDITY:  Serial.println("/* display humidity   */"); break;
+        case LIGHT:     Serial.println("/* display light      */"); break;
+        case GAS:       Serial.println("/* display gas level  */"); break;
+        case NEUTRAL:   Serial.println("/* idle message       */"); break;
+    }
+  delay(500); // Wait for a second before the next loop iteration
+
+}
+
+
+void check_wire_connection(){
+    // I2C Scanner
   Wire.begin();
   Serial.println("Scanning I2C bus...");
   for (byte address = 1; address < 127; ++address) {
@@ -18,16 +40,4 @@ void setup() {
     }
   }
   Serial.println("I2C scan complete.");
-  // Initialize the accelerometer
-  accelerometer.initialize(SCALE_2G, ODR_200);
-}
-
-void loop() {
-
-  accelerometer.read_if_available(); // Check if new data is available and read it
-  // accelerometer.print_binary_accelerations(); // Print raw accelerometer data in binary
-  accelerometer.print_calculated_accelerations(); // Print calculated accelerations in g's
-  accelerometer.print_orinetation(); // Print the current orientation
-  delay(500); // Wait for a second before the next loop iteration
-
 }
