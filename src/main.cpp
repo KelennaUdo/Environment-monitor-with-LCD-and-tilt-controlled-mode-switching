@@ -1,9 +1,13 @@
 #include <Arduino.h>
 #include <accelerometer/accelerometer.h>
 #include <Wire.h>
-#include <./mode_switch/mode_switch.h>
+#include <mode_switch/mode_switch.h>
 
 Accelerometer accelerometer;
+
+// Function to check the I2C connection
+void check_wire_connection();
+
 void setup() {
   Serial.begin(9600);
   // Initialize the accelerometer
@@ -13,16 +17,17 @@ void setup() {
 
 void loop() {
   accelerometer.read_if_available(); // Read accelerometer data if available
-   updateModeSwitch(accelerometer.getOrientation()); // Update the mode switch based on orientation
+  updateModeSwitch(accelerometer.getOrientation()); // Update the mode switch based on orientation
 
-    switch (currentMode())
-    {
-        case TEMP:     Serial.println("/* display temperature */"); break;
-        case HUMIDITY:  Serial.println("/* display humidity   */"); break;
-        case LIGHT:     Serial.println("/* display light      */"); break;
-        case GAS:       Serial.println("/* display gas level  */"); break;
-        case NEUTRAL:   Serial.println("/* idle message       */"); break;
-    }
+  switch (currentMode())
+  {
+      case TEMP:     Serial.println("/* display temperature */"); break;
+      case HUMIDITY:  Serial.println("/* display humidity   */"); break;
+      case LIGHT:     Serial.println("/* display light      */"); break;
+      case GAS:       Serial.println("/* display gas level  */"); break;
+      case NEUTRAL:   Serial.println("/* idle message       */"); break;
+  }
+  // accelerometer.print_orinetation();
   delay(500); // Wait for a second before the next loop iteration
 
 }

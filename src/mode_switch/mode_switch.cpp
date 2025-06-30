@@ -19,6 +19,7 @@ static uint32_t      _lastChange = 0;
 static byte          _selectedOrientation = LOCKOUT;
 static byte          _lastOrientation = LOCKOUT;
 
+
 /* -------------------------------------------------- */
 void modeSwitchBegin()
 {
@@ -40,9 +41,9 @@ static Mode orientationToMode(byte orientation)
     {
         case PORTRAIT_U:   return TEMP;
         case PORTRAIT_D:   return HUMIDITY;
-        case LANDSCAPE_R:  return LIGHT;
+        case LANDSCAPE_R:  return NEUTRAL;
         case LANDSCAPE_L:  return GAS;
-        default:           return NEUTRAL;   // LOCKOUT or unknown
+        default:           return LIGHT;   // LOCKOUT or unknown
     }
 }
 
@@ -54,7 +55,7 @@ void updateModeSwitch(byte orientation)
     switch (_fsm)
     {
         case WAITING_FOR_TILT:
-            if ((orientation != LOCKOUT) && (debounceExpired()) && (orientation != _lastOrientation))
+            if ((orientation != LANDSCAPE_R) && (debounceExpired()) && (orientation != _lastOrientation))
             {
                 _selectedOrientation = orientation;
                 _fsm = AWAITING_RETURN_TO_NEUTRAL;
@@ -63,7 +64,7 @@ void updateModeSwitch(byte orientation)
             break;
 
         case AWAITING_RETURN_TO_NEUTRAL:
-            if (orientation == LOCKOUT && debounceExpired())
+            if (orientation == LANDSCAPE_R && debounceExpired())
             {
                 _mode = orientationToMode(_selectedOrientation);
                 _fsm  = WAITING_FOR_TILT;
