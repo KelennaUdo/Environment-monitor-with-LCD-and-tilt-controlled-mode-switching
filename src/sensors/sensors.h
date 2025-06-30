@@ -12,8 +12,20 @@ private:
     float humidity;    // Variable to hold humidity data
     float light;       // Variable to hold light data
     float gas;         // Variable to hold gas level data
+    // Pin numbers for sensors
+    int dht11_pin = -1;
+    int linear_temp_sensor_pin = -1;
+    int analog_temp_sensor_pin = -1;
+    int humidity_pin = -1;
+    int light_pin = -1;
+    int gas_pin = -1;
 public:
-    sensors(/* args */);
+    // Default constructor
+    sensors();
+    // Overloaded constructor for temperature sensors
+    sensors(int dht11, int linear_temp, int analog_temp);
+    // Overloaded constructor for all sensors
+    sensors(int dht11, int linear_temp, int analog_temp, int humidity, int light, int gas);
     ~sensors();
     float get_temperature_dht11() const { return temperature_dht11; } // Getter for temperature
     float get_temperature_linear_temp_sensor() const { return temperature_linear_temp_sensor; } // Getter for linear temperature meter
@@ -35,14 +47,19 @@ public:
     void read_gas();         // Method to read gas level data
 };
 
-sensors::sensors(/* args */)
-{
-}
+// Default constructor
+sensors::sensors() {}
+// Overloaded constructor for temperature sensors
+sensors::sensors(int dht11, int linear_temp, int analog_temp)
+    : dht11_pin(dht11), linear_temp_sensor_pin(linear_temp), analog_temp_sensor_pin(analog_temp) {}
+// Overloaded constructor for all sensors
+sensors::sensors(int dht11, int linear_temp, int analog_temp, int humidity, int light, int gas)
+    : dht11_pin(dht11), linear_temp_sensor_pin(linear_temp), analog_temp_sensor_pin(analog_temp),
+      humidity_pin(humidity), light_pin(light), gas_pin(gas) {}
 
 sensors::~sensors()
 {
 }
-
 
 
 
