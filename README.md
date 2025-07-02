@@ -1,6 +1,6 @@
 # Environment Monitor with LCD and Tilt-Controlled Mode Switching
 
-This project is the first step in building an Arduino-based environment monitoring system. The final goal is to display environmental data on an LCD screen and allow users to switch between different display or operation modes by tilting the device, using an onboard accelerometer for intuitive, button-free control.
+This project is an Arduino-based environment monitoring system. The final goal is to display environmental data on an LCD screen and allow users to switch between different display or operation modes by tilting the device, using an onboard accelerometer for intuitive, button-free control.
 
 ## Current Status
 
@@ -13,6 +13,10 @@ This project is the first step in building an Arduino-based environment monitori
 - Introduced a finite state machine (FSM) to manage different operation modes.
 - The device now switches modes based on orientation readings from the accelerometer, enabling tilt-based mode switching.
 
+**Stage 3:**  
+- Added a dedicated sensor class to manage readings from all five sensors (DHT11, linear temperature sensor, analog temperature sensor, light sensor, and gas sensor).
+- The sensor class abstracts sensor initialization and data collection, simplifying the main program logic and improving code maintainability.
+
 ## Features (Current)
 
 - I2C device scanning and initialization
@@ -20,18 +24,19 @@ This project is the first step in building an Arduino-based environment monitori
 - Orientation detection (portrait/landscape/flat)
 - OOP-based code structure
 - FSM-based mode switching using accelerometer orientation
+- Centralized sensor management via a dedicated class
 
 ## Next Steps
 
-- Integrate environmental sensors (e.g., temperature, humidity)
-- Add LCD display for data output
+- Integrate LCD display for data output
 - Expand FSM to handle more complex interactions
+- Add calibration and error handling for sensors
 
 ## Getting Started
 
-1. Connect the MMA8452Q accelerometer to your Arduino (SDA to A4, SCL to A5, VCC, and GND).
+1. Connect the MMA8452Q accelerometer and all sensors to your Arduino (see code for pin assignments).
 2. Upload the code using PlatformIO or Arduino IDE.
-3. Open the serial monitor at 9600 baud to view accelerometer data and orientation.
+3. Open the serial monitor at 9600 baud to view sensor data and orientation.
 
 ## License
 
