@@ -17,6 +17,10 @@ This project is an Arduino-based environment monitoring system. The final goal i
 - Added a dedicated sensor class to manage readings from all five sensors (DHT11, linear temperature sensor, analog temperature sensor, light sensor, and gas sensor).
 - The sensor class abstracts sensor initialization and data collection, simplifying the main program logic and improving code maintainability.
 
+**Stage 4:**
+- Added two physical buttons to enable bi-directional mode switching, allowing users to change modes manually in addition to tilt-based switching.
+- The program now supports both button-based and accelerometer-based mode navigation for greater flexibility and accessibility.
+
 ## Features (Current)
 
 - I2C device scanning and initialization
@@ -25,6 +29,7 @@ This project is an Arduino-based environment monitoring system. The final goal i
 - OOP-based code structure
 - FSM-based mode switching using accelerometer orientation
 - Centralized sensor management via a dedicated class
+- Bi-directional mode switching using two physical buttons
 
 ## Next Steps
 
@@ -35,8 +40,9 @@ This project is an Arduino-based environment monitoring system. The final goal i
 ## Getting Started
 
 1. Connect the MMA8452Q accelerometer and all sensors to your Arduino (see code for pin assignments).
-2. Upload the code using PlatformIO or Arduino IDE.
-3. Open the serial monitor at 9600 baud to view sensor data and orientation.
+2. Connect two push buttons to the specified digital pins for manual mode switching.
+3. Upload the code using PlatformIO or Arduino IDE.
+4. Open the serial monitor at 9600 baud to view sensor data and orientation.
 
 ## License
 

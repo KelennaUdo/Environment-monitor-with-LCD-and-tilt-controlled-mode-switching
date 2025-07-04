@@ -1,15 +1,12 @@
 #include "mode_switch.h"
 #include <SparkFun_MMA8452Q.h>   // Accelerometer library
 
+
 // ----- Accelerometer instance (extern or create your own) -----
 // extern MMA8452Q accel;           // Declared in main.cpp
 
-// ----- FSM states -----
-enum TiltFSMState : uint8_t
-{
-    WAITING_FOR_TILT = 0,
-    AWAITING_RETURN_TO_NEUTRAL
-};
+
+
 
 // ----- File-local (static) variables -----
 static Mode          _mode  = NEUTRAL;
@@ -26,6 +23,7 @@ void modeSwitchBegin()
     _mode  = NEUTRAL;
     _fsm   = WAITING_FOR_TILT;
     _lastChange = millis();
+    
 }
 
 /* -------------------------------------------------- */
@@ -48,7 +46,7 @@ static Mode orientationToMode(byte orientation)
 }
 
 /* -------------------------------------------------- */
-void updateModeSwitch(byte orientation)
+void updateModeSwitchAccelerometer(byte orientation)
 {
 
     // ----- Finite-state machine -----
@@ -77,6 +75,33 @@ void updateModeSwitch(byte orientation)
             break;
     }
   _lastOrientation = orientation;
+}
+
+void updateModeSwitchButtons(uint8_t button_pressed)
+{
+    if (debounceExpired())
+    {
+        _lastChange = millis();
+        switch (button_pressed)
+        {
+            case BUTTON_INC:
+                if (_mode < GAS) {
+                    _mode = static_cast<Mode>(_mode + 1);
+                } else {
+                    _mode = TEMP; // wrap around
+                }
+                break;
+            case BUTTON_DEC:
+                if (_mode > NEUTRAL) {
+                    _mode = static_cast<Mode>(_mode - 1);
+                } else {
+                    _mode = GAS; // wrap around
+                }
+                break;
+        }
+        Serial.print(F("Mode switched to: "));
+        Serial.println(_mode);
+    }
 }
 
 /* -------------------------------------------------- */

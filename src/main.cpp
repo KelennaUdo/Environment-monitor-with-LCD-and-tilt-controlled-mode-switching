@@ -9,6 +9,21 @@ Accelerometer accelerometer;
 sensors envSensors(2, 3, 4,5,0); 
 // Function to check the I2C connection
 void check_wire_connection();
+bool isButtonPressed(uint8_t button) {
+  return digitalRead(button) == LOW; // Button pressed when pin reads LOW
+}
+
+const uint8_t button_dec = 8;
+const uint8_t button_inc = 9;
+bool button_dec_pressed = false;
+bool button_inc_pressed = false;
+bool button_dec_previous = false; // To track the previous state of button_dec
+bool button_inc_previous = false; // To track the previous state of button_inc
+bool debounceExpired(unsigned long lastChange, unsigned long debounceMs) {
+  return (millis() - lastChange) > debounceMs;
+}
+unsigned long lastChangeDec = 0;   // debounce for DEC button
+unsigned long lastChangeInc = 0;   // debounce for INC button
 
 void setup() {
   Serial.begin(9600);
@@ -16,12 +31,41 @@ void setup() {
   // Initialize the accelerometer
   accelerometer.initialize(SCALE_2G, ODR_200);
   modeSwitchBegin(); // Initialize the mode switch
+  pinMode(button_dec, INPUT_PULLUP); // Set button_dec as input with pull-up resistor
+  pinMode(button_inc, INPUT_PULLUP); // Set button_inc as input with pull-up resistor
 }
 
 void loop() {
-  accelerometer.read_if_available(); // Read accelerometer data if available
-  updateModeSwitch(accelerometer.getOrientation()); // Update the mode switch based on orientation
+  // Read button states
+  button_dec_pressed = isButtonPressed(button_dec);
+  button_inc_pressed = isButtonPressed(button_inc);
 
+
+  if( button_dec_pressed && button_inc_pressed){ //check if both buttons are pressed
+    return;
+  }
+  else if((button_dec_pressed || button_inc_pressed) ) // Check if either button is pressed
+  {  
+    if(button_dec_previous == false && button_dec_pressed == true  && debounceExpired(lastChangeDec, 200)){
+      updateModeSwitchButtons(BUTTON_DEC);
+      lastChangeDec = millis(); // Update last change time
+}
+    else if(button_inc_previous == false && button_inc_pressed == true && debounceExpired(lastChangeInc, 200)){
+      updateModeSwitchButtons(BUTTON_INC);
+      lastChangeInc = millis(); // Update last change time     
+    }    
+
+     button_dec_previous = button_dec_pressed; // Store the previous state of button_dec
+     button_inc_previous = button_inc_pressed; // Store the previous state of button_inc
+  }
+  
+    
+  accelerometer.read_if_available(); // Read accelerometer data if available
+  updateModeSwitchAccelerometer(accelerometer.getOrientation()); // Update the mode switch based on orientation
+
+  if(!button_dec_pressed && !button_inc_pressed) // Only switch modes if no buttons are pressed
+  {
+    
   switch (currentMode())
   {
       case TEMP:
@@ -58,9 +102,12 @@ void loop() {
         Serial.println("/* idle message       */");
         break;
   }
-  delay(500); // Wait for a second before the next loop iteration
 
 }
+  delay(500); // Wait for a second before the next loop iteration
+}
+
+
 
 
 void check_wire_connection(){
