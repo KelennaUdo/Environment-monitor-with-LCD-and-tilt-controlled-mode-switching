@@ -25,8 +25,22 @@ void sensors::read_temperature_linear_temp_sensor() {
         Serial.println("Linear temperature sensor pin not set. Cannot read temperature.");
         return;
     }
-    int16_t val = analogRead(linear_temp_sensor_pin);
-    temperature_linear_temp_sensor = (val * 5.0 / 1023.0) * 100.0; // Convert analog value to temperature
+
+    const uint8_t oversample = 10;
+    const float vRef = 5.0; // Assuming you're using 5V AREF
+
+    uint32_t sum = 0;
+    for (uint8_t i = 0; i < oversample; i++) {
+        sum += analogRead(linear_temp_sensor_pin);
+    }
+
+    float average = sum / (float)oversample;
+    float voltage = (average * vRef) / 1023.0;
+
+    // TMP36: 500mV = 0°C, 10mV per °C
+    temperature_linear_temp_sensor = (voltage - 0.5) * 100.0;
+
+
 }
 
 void sensors::read_temperature_analog_temp_sensor() {
@@ -34,17 +48,23 @@ void sensors::read_temperature_analog_temp_sensor() {
         Serial.println("Analog temperature sensor pin not set. Cannot read temperature.");
         return;
     }
-    uint8_t oversample = 10; // Oversampling factor
-    uint16_t vRef_mV = 5000; // Reference voltage in mV
+
+    const uint8_t oversample = 10;
+    const float vRef = 5.0; // 5V reference
+
     uint32_t sum = 0;
     for (uint8_t i = 0; i < oversample; i++) {
         sum += analogRead(analog_temp_sensor_pin);
     }
-    float average = sum / (float)oversample; // average the readings
-    float ave_voltage = (average * vRef_mV) / 1023.0; // Convert to voltage
-    temperature_analog_temp_sensor = (ave_voltage - 500.0) / 10.0; // Convert voltage to temperature in Celsius
+
+    float average = sum / (float)oversample;
+    float voltage = (average * vRef) / 1023.0;
+
+    // TMP36: 0.5V offset, 10mV per °C
+    temperature_analog_temp_sensor = (voltage - 0.5) * 100.0;
 
 }
+
 
 void sensors::read_humidity() {
     if (dht11_pin == -1) {

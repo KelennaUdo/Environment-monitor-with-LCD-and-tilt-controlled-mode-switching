@@ -6,7 +6,7 @@
 
 Accelerometer accelerometer;
 
-sensors envSensors(2, 3, 4,5,0); 
+sensors envSensors(2, 3, 4, 5,0); 
 // Function to check the I2C connection
 void check_wire_connection();
 bool isButtonPressed(uint8_t button) {
@@ -42,24 +42,28 @@ void loop() {
 
 
   if( button_dec_pressed && button_inc_pressed){ //check if both buttons are pressed
+    Serial.println("both buttons pressed");
     return;
   }
-  else if((button_dec_pressed || button_inc_pressed) ) // Check if either button is pressed
-  {  
-    if(button_dec_previous == false && button_dec_pressed == true  && debounceExpired(lastChangeDec, 200)){
-      updateModeSwitchButtons(BUTTON_DEC);
-      lastChangeDec = millis(); // Update last change time
-}
-    else if(button_inc_previous == false && button_inc_pressed == true && debounceExpired(lastChangeInc, 200)){
-      updateModeSwitchButtons(BUTTON_INC);
-      lastChangeInc = millis(); // Update last change time     
-    }    
+  else if((button_dec_pressed || button_inc_pressed))
+  {
+      Serial.println("one button pressed");
+      if(button_dec_previous == false && button_dec_pressed == true && debounceExpired(lastChangeDec, 200)){
+          updateModeSwitchButtons(BUTTON_DEC);
+          Serial.println("Button DEC pressed");
+          lastChangeDec = millis();
+      }
+      else if(button_inc_previous == false && button_inc_pressed == true && debounceExpired(lastChangeInc, 200)){
+          updateModeSwitchButtons(BUTTON_INC);
+          Serial.println("Button INC pressed");
+          lastChangeInc = millis();
+      }
 
-     button_dec_previous = button_dec_pressed; // Store the previous state of button_dec
-     button_inc_previous = button_inc_pressed; // Store the previous state of button_inc
   }
-  
-    
+
+  // Always update previous states at the end
+  button_dec_previous = button_dec_pressed;
+  button_inc_previous = button_inc_pressed;   
   accelerometer.read_if_available(); // Read accelerometer data if available
   updateModeSwitchAccelerometer(accelerometer.getOrientation()); // Update the mode switch based on orientation
 
@@ -74,13 +78,13 @@ void loop() {
         envSensors.read_temperature_analog_temp_sensor();
         Serial.print("DHT11 Temp: ");
         Serial.print(envSensors.get_temperature_dht11());
-        Serial.print(" C, Linear Temp: ");
+        Serial.print(" ℃, Linear Temp: ");
         Serial.print(envSensors.get_temperature_linear_temp_sensor());
-        Serial.print(" C, Analog Temp: ");
+        Serial.print(" ℃, Analog Temp: ");
         Serial.print(envSensors.get_temperature_analog_temp_sensor());
-        Serial.print(" C, Avg: ");
+        Serial.print(" ℃, Avg: ");
         Serial.print(envSensors.get_average_temperature());
-        Serial.println(" C");
+        Serial.println(" ℃");
         break;
       case HUMIDITY:
         envSensors.read_humidity();
