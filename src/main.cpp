@@ -3,9 +3,10 @@
 #include <Wire.h>
 #include <mode_switch/mode_switch.h>
 #include <sensors/sensors.h>
+#include <LiquidCrystal.h>
 
 Accelerometer accelerometer;
-
+LiquidCrystal lcd(8, 9, 10, 11, 12, 13); // Initialize LCD with pins RS, E, D4, D5, D6, D7
 sensors envSensors(2, 3, 4, 5,0); 
 // Function to check the I2C connection
 void check_wire_connection();
@@ -13,8 +14,8 @@ bool isButtonPressed(uint8_t button) {
   return digitalRead(button) == LOW; // Button pressed when pin reads LOW
 }
 
-const uint8_t button_dec = 8;
-const uint8_t button_inc = 9;
+const uint8_t button_dec = 6;
+const uint8_t button_inc = 7;
 bool button_dec_pressed = false;
 bool button_inc_pressed = false;
 bool button_dec_previous = false; // To track the previous state of button_dec
@@ -69,43 +70,51 @@ void loop() {
 
   if(!button_dec_pressed && !button_inc_pressed) // Only switch modes if no buttons are pressed
   {
-    
-  switch (currentMode())
-  {
-      case TEMP:
-        envSensors.read_temperature_dht11();
-        envSensors.read_temperature_linear_temp_sensor();
-        envSensors.read_temperature_analog_temp_sensor();
-        Serial.print("DHT11 Temp: ");
-        Serial.print(envSensors.get_temperature_dht11());
-        Serial.print(" ℃, Linear Temp: ");
-        Serial.print(envSensors.get_temperature_linear_temp_sensor());
-        Serial.print(" ℃, Analog Temp: ");
-        Serial.print(envSensors.get_temperature_analog_temp_sensor());
-        Serial.print(" ℃, Avg: ");
-        Serial.print(envSensors.get_average_temperature());
-        Serial.println(" ℃");
-        break;
-      case HUMIDITY:
-        envSensors.read_humidity();
-        Serial.print("Humidity: ");
-        Serial.print(envSensors.get_humidity());
-        Serial.println(" %");
-        break;
-      case LIGHT:
-        envSensors.read_light();
-        Serial.print("Light: ");
-        Serial.println(envSensors.get_light());
-        break;
-      case GAS:
-        envSensors.read_gas();
-        Serial.print("Gas: ");
-        Serial.println(envSensors.get_gas());
-        break;
-      case NEUTRAL:
-        Serial.println("/* idle message       */");
-        break;
-  }
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    switch (currentMode())
+    {
+        case TEMP:
+          envSensors.read_temperature_dht11();
+          envSensors.read_temperature_linear_temp_sensor();
+          envSensors.read_temperature_analog_temp_sensor();
+          // First line: D:<val> L:<val>
+          lcd.print("D:");
+          lcd.print(envSensors.get_temperature_dht11(), 1);
+          lcd.print(" L:");
+          lcd.print(envSensors.get_temperature_linear_temp_sensor(), 1);
+          // Second line: A:<val> Avg:<val>
+          lcd.setCursor(0, 1);
+          lcd.print("A:");
+          lcd.print(envSensors.get_temperature_analog_temp_sensor(), 1);
+          lcd.print(" Avg:");
+          lcd.print(envSensors.get_average_temperature(), 1);
+          break;
+        case HUMIDITY:
+          envSensors.read_humidity();
+          lcd.print("Humidity:");
+          lcd.setCursor(0, 1);
+          lcd.print(envSensors.get_humidity(), 1);
+          lcd.print(" %");
+          break;
+        case LIGHT:
+          envSensors.read_light();
+          lcd.print("Light:");
+          lcd.setCursor(0, 1);
+          lcd.print(envSensors.get_light());
+          break;
+        case GAS:
+          envSensors.read_gas();
+          lcd.print("Gas:");
+          lcd.setCursor(0, 1);
+          lcd.print(envSensors.get_gas());
+          break;
+        case NEUTRAL:
+          lcd.print("Welcome to my");
+          lcd.setCursor(0, 1);
+          lcd.print("Env Sensor Hub!");
+          break;
+    }
 
 }
   delay(500); // Wait for a second before the next loop iteration
