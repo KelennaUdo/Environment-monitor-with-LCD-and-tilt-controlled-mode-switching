@@ -25,6 +25,11 @@ This project is an Arduino-based environment monitoring system. The final goal i
 - Added two physical buttons to enable bi-directional mode switching, allowing users to change modes manually in addition to tilt-based switching.
 - The program now supports both button-based and accelerometer-based mode navigation for greater flexibility and accessibility.
 
+**Stage 5:**
+
+- Integrated a 16x2 LCD display to show real-time sensor data and system status.
+- The LCD displays temperature, humidity, light, and gas readings based on the current mode, and shows a welcome message in idle mode.
+
 ## Features (Current)
 
 - I2C device scanning and initialization
@@ -34,20 +39,22 @@ This project is an Arduino-based environment monitoring system. The final goal i
 - FSM-based mode switching using accelerometer orientation
 - Centralized sensor management via a dedicated class
 - Bi-directional mode switching using two physical buttons
+- LCD display for real-time sensor data and system messages
 
 ## Next Steps
 
-- Integrate LCD display for data output
 - Expand FSM to handle more complex interactions
 - Add calibration and error handling for sensors
+- Enhance LCD display with additional information or graphics
 
 ## Getting Started
 
 1. Connect the MMA8452Q accelerometer and all sensors to your Arduino (see code for pin assignments).
 2. Connect two push buttons to the specified digital pins for manual mode switching.
-3. Upload the code using PlatformIO or Arduino IDE.
-4. Open the serial monitor at 9600 baud to view sensor data and orientation.
+3. Connect a 16x2 LCD display to the specified pins.
+4. Upload the code using PlatformIO or Arduino IDE.
+5. Open the serial monitor at 9600 baud to view sensor data and orientation.
 
 ## License
 
-MIT.
+MIT
