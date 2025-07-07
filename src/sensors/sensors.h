@@ -4,6 +4,7 @@
 #include <vector> // Include vector for storing multiple temperature readings
 #include <dht11.h> // Include DHT11 library for temperature and humidity sensor
 
+
 class sensors
 {
 private:
@@ -17,6 +18,7 @@ private:
     //sensor objects with librarires
     // DHT11 sensor object
     dht11 dht11_sensor;
+    // Thermistor sensor object for linear temperature sensor
     
 
     // Pin numbers for sensors

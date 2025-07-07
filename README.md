@@ -5,19 +5,23 @@ This project is an Arduino-based environment monitoring system. The final goal i
 ## Current Status
 
 **Stage 1:**  
+
 - Reads data from an MMA8452Q accelerometer (connected via I2C).
 - Logs raw and calculated acceleration values, as well as device orientation, to the serial monitor.
 - The code is written using an object-oriented programming (OOP) paradigm for modularity and future extensibility.
 
 **Stage 2:**  
+
 - Introduced a finite state machine (FSM) to manage different operation modes.
 - The device now switches modes based on orientation readings from the accelerometer, enabling tilt-based mode switching.
 
 **Stage 3:**  
+
 - Added a dedicated sensor class to manage readings from all five sensors (DHT11, linear temperature sensor, analog temperature sensor, light sensor, and gas sensor).
 - The sensor class abstracts sensor initialization and data collection, simplifying the main program logic and improving code maintainability.
 
 **Stage 4:**
+
 - Added two physical buttons to enable bi-directional mode switching, allowing users to change modes manually in addition to tilt-based switching.
 - The program now supports both button-based and accelerometer-based mode navigation for greater flexibility and accessibility.
 
@@ -46,4 +50,4 @@ This project is an Arduino-based environment monitoring system. The final goal i
 
 ## License
 
-MIT
+MIT.

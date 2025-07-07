@@ -84,7 +84,7 @@ void updateModeSwitchButtons(uint8_t button_pressed)
         _lastChange = millis();
         switch (button_pressed)
         {
-            case BUTTON_INC:
+                case BUTTON_INC:
                 if (_mode < GAS) {
                     _mode = static_cast<Mode>(_mode + 1);
                 } else {
