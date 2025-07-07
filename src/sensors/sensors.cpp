@@ -1,5 +1,7 @@
 #include "sensors.h"
 
+
+
 sensors::sensors(){}
 // Overloaded constructor for all sensors
 sensors::sensors(int dht11, int linear_temp, int analog_temp, int light, int gas): dht11_pin(dht11), 
@@ -25,20 +27,19 @@ void sensors::read_temperature_linear_temp_sensor() {
         Serial.println("Linear temperature sensor pin not set. Cannot read temperature.");
         return;
     }
-
     const uint8_t oversample = 10;
-    const float vRef = 5.0; // Assuming you're using 5V AREF
-
     uint32_t sum = 0;
     for (uint8_t i = 0; i < oversample; i++) {
         sum += analogRead(linear_temp_sensor_pin);
     }
+    int rawADC = sum / oversample;
 
-    float average = sum / (float)oversample;
-    float voltage = (average * vRef) / 1023.0;
 
-    // TMP36: 500mV = 0°C, 10mV per °C
-    temperature_linear_temp_sensor = (voltage - 0.5) * 100.0;
+  // Convert ADC reading to voltage (assuming 5V reference)
+    float voltage = rawADC * (5.0 / 1023.0);  // in volts
+
+  // Convert voltage to temperature (°C)
+    temperature_linear_temp_sensor = (voltage * 100.0)-273.15;     // 10mV per °C → V * 100
 
 
 }
@@ -50,7 +51,14 @@ void sensors::read_temperature_analog_temp_sensor() {
     }
 
     const uint8_t oversample = 10;
-    const float vRef = 5.0; // 5V reference
+    const float vRef = 5.0; // Assuming 5V reference
+    const int adcMax = 1023;
+
+    // Thermistor parameters
+    const float seriesResistor = 10000.0; // 10kΩ series resistor
+    const float nominalResistance = 10000.0; // 10kΩ at 25°C
+    const float nominalTemperature = 25.0; // 25°C
+    const float bCoefficient = 3950.0; // Beta coefficient
 
     uint32_t sum = 0;
     for (uint8_t i = 0; i < oversample; i++) {
@@ -58,10 +66,22 @@ void sensors::read_temperature_analog_temp_sensor() {
     }
 
     float average = sum / (float)oversample;
-    float voltage = (average * vRef) / 1023.0;
+    float voltage = (average * vRef) / adcMax;
+    float resistance = seriesResistor * ((vRef / voltage) - 1.0);
 
-    // TMP36: 0.5V offset, 10mV per °C
-    temperature_analog_temp_sensor = (voltage - 0.5) * 100.0;
+    // Steinhart-Hart equation
+    float steinhart;
+    steinhart = resistance / nominalResistance;     // (R/Ro)
+    steinhart = log(steinhart);                     // ln(R/Ro)
+    steinhart /= bCoefficient;                      // 1/B * ln(R/Ro)
+    steinhart += 1.0 / (nominalTemperature + 273.15); // + (1/To)
+    steinhart = 1.0 / steinhart;                    // Invert
+    steinhart -= 273.15;                            // Convert to °C
+
+    // Calibration offset (measured error: reading is ~27°C too high)
+    // Adjust this value based on your calibration measurements
+    // const float calibration_offset = -27.0;
+    temperature_analog_temp_sensor = steinhart;
 
 }
 

@@ -13,8 +13,8 @@ bool isButtonPressed(uint8_t button) {
   return digitalRead(button) == LOW; // Button pressed when pin reads LOW
 }
 
-const uint8_t button_dec = 8;
-const uint8_t button_inc = 9;
+const uint8_t button_dec = 6;
+const uint8_t button_inc = 7;
 bool button_dec_pressed = false;
 bool button_inc_pressed = false;
 bool button_dec_previous = false; // To track the previous state of button_dec
