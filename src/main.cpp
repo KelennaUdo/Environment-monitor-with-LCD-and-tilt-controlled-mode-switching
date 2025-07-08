@@ -6,14 +6,18 @@
 #include <LiquidCrystal.h>
 
 Accelerometer accelerometer;
+
+sensors envSensors(2, 1, 2, 5,0); //D2, A1, A2, D5,A0
 LiquidCrystal lcd(8, 9, 10, 11, 12, 13); // Initialize LCD with pins RS, E, D4, D5, D6, D7
-sensors envSensors(2, 3, 4, 5,0); 
+
 // Function to check the I2C connection
 void check_wire_connection();
 bool isButtonPressed(uint8_t button) {
   return digitalRead(button) == LOW; // Button pressed when pin reads LOW
 }
 
+const uint8_t button_dec = 6;
+const uint8_t button_inc = 7;
 const uint8_t button_dec = 6;
 const uint8_t button_inc = 7;
 bool button_dec_pressed = false;

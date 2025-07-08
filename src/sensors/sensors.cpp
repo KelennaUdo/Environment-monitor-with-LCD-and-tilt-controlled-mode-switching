@@ -1,5 +1,7 @@
 #include "sensors.h"
 
+
+
 sensors::sensors(){}
 // Overloaded constructor for all sensors
 sensors::sensors(int dht11, int linear_temp, int analog_temp, int light, int gas): dht11_pin(dht11), 
@@ -25,22 +27,14 @@ void sensors::read_temperature_linear_temp_sensor() {
         Serial.println("Linear temperature sensor pin not set. Cannot read temperature.");
         return;
     }
-
     const uint8_t oversample = 10;
-    const float vRef = 5.0; // Assuming you're using 5V AREF
-
     uint32_t sum = 0;
     for (uint8_t i = 0; i < oversample; i++) {
         sum += analogRead(linear_temp_sensor_pin);
     }
-
-    float average = sum / (float)oversample;
-    float voltage = (average * vRef) / 1023.0;
-
-    // TMP36: 500mV = 0°C, 10mV per °C
-    temperature_linear_temp_sensor = (voltage - 0.5) * 100.0;
-
-
+    uint32_t rawADC = sum / oversample;
+     //code below is from the kit manual 👇👇
+    temperature_linear_temp_sensor = (500 * rawADC) /1024;
 }
 
 void sensors::read_temperature_analog_temp_sensor() {
@@ -50,19 +44,18 @@ void sensors::read_temperature_analog_temp_sensor() {
     }
 
     const uint8_t oversample = 10;
-    const float vRef = 5.0; // 5V reference
-
+   
     uint32_t sum = 0;
     for (uint8_t i = 0; i < oversample; i++) {
         sum += analogRead(analog_temp_sensor_pin);
     }
-
     float average = sum / (float)oversample;
-    float voltage = (average * vRef) / 1023.0;
 
-    // TMP36: 0.5V offset, 10mV per °C
-    temperature_analog_temp_sensor = (voltage - 0.5) * 100.0;
-
+    //code below is from the kit manual 👇👇
+    float fenya=(average/1023)*5; 
+    float r=(5-fenya)/fenya*4700; // Calculate the resistance of the thermistor
+    
+    temperature_analog_temp_sensor = (1/( log(r/10000) /3950 + 1/(25+273.15))-273.15); // Convert to Celsius using the Steinhart-Hart equation
 }
 
 
