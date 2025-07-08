@@ -6,7 +6,7 @@
 
 Accelerometer accelerometer;
 
-sensors envSensors(2, 3, 4, 5,0); 
+sensors envSensors(2, 1, 2, 5,0); //D2, A1, A2, D5,A0
 // Function to check the I2C connection
 void check_wire_connection();
 bool isButtonPressed(uint8_t button) {

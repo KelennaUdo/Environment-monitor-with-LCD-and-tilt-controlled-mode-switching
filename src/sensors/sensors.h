@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <vector> // Include vector for storing multiple temperature readings
 #include <dht11.h> // Include DHT11 library for temperature and humidity sensor
-
+#include <math.h> // Include math library for calculations
 
 class sensors
 {
