@@ -1,90 +1,130 @@
 #include "sensors.h"
 
-
-
 sensors::sensors(){}
-// Overloaded constructor for all sensors
-sensors::sensors(int dht11, int linear_temp, int analog_temp, int light, int gas): dht11_pin(dht11), 
-linear_temp_sensor_pin(linear_temp), analog_temp_sensor_pin(analog_temp), light_pin(light), gas_pin(gas) {}
 
-sensors::sensors(int dht11, int linear_temp, int analog_temp): dht11_pin(dht11), 
-linear_temp_sensor_pin(linear_temp), analog_temp_sensor_pin(analog_temp){}
-sensors::~sensors() {
-    // Destructor can be used for cleanup if needed
+// Overloaded constructor for all sensors
+sensors::sensors(int dht11, int linear_temp, int analog_temp, int light, int gas) {
+    if (dht11 != -1) {
+        dht11_temp_sensor = std::make_unique<DHT11Sensor>(dht11);
+        humidity_sensor = std::make_unique<HumiditySensor>(dht11);
+    }
+    if (linear_temp != -1) {
+        linear_temp_sensor = std::make_unique<LinearTemperatureSensor>(linear_temp);
+    }
+    if (analog_temp != -1) {
+        analog_temp_sensor = std::make_unique<AnalogTemperatureSensor>(analog_temp);
+    }
+    if (light != -1) {
+        light_sensor = std::make_unique<LightSensor>(light);
+    }
+    if (gas != -1) {
+        gas_sensor = std::make_unique<GasSensor>(gas);
+    }
 }
 
-void sensors::read_temperature_dht11 (){
-    if (dht11_pin == -1) {
-        Serial.println("DHT11 pin not set. Cannot read temperature.");
-        return;
+sensors::sensors(int dht11, int linear_temp, int analog_temp) {
+    if (dht11 != -1) {
+        dht11_temp_sensor = std::make_unique<DHT11Sensor>(dht11);
+        humidity_sensor = std::make_unique<HumiditySensor>(dht11);
     }
-    dht11_sensor.read(dht11_pin);
-    temperature_dht11 = dht11_sensor.temperature;
+    if (linear_temp != -1) {
+        linear_temp_sensor = std::make_unique<LinearTemperatureSensor>(linear_temp);
+    }
+    if (analog_temp != -1) {
+        analog_temp_sensor = std::make_unique<AnalogTemperatureSensor>(analog_temp);
+    }
+}
+
+sensors::~sensors() {
+    // Smart pointers will automatically clean up
+}
+
+// Backward compatible read methods
+void sensors::read_temperature_dht11() {
+    if (dht11_temp_sensor) {
+        dht11_temp_sensor->read();
+    }
 }
 
 void sensors::read_temperature_linear_temp_sensor() {
-    if (linear_temp_sensor_pin == -1) {
-        Serial.println("Linear temperature sensor pin not set. Cannot read temperature.");
-        return;
+    if (linear_temp_sensor) {
+        linear_temp_sensor->read();
     }
-    const uint8_t oversample = 10;
-    uint32_t sum = 0;
-    for (uint8_t i = 0; i < oversample; i++) {
-        sum += analogRead(linear_temp_sensor_pin);
-    }
-    uint32_t rawADC = sum / oversample;
-     //code below is from the kit manual 👇👇
-    temperature_linear_temp_sensor = (500 * rawADC) /1024;
 }
 
 void sensors::read_temperature_analog_temp_sensor() {
-    if (analog_temp_sensor_pin == -1) {
-        Serial.println("Analog temperature sensor pin not set. Cannot read temperature.");
-        return;
+    if (analog_temp_sensor) {
+        analog_temp_sensor->read();
     }
-
-    const uint8_t oversample = 10;
-   
-    uint32_t sum = 0;
-    for (uint8_t i = 0; i < oversample; i++) {
-        sum += analogRead(analog_temp_sensor_pin);
-    }
-    float average = sum / (float)oversample;
-
-    //code below is from the kit manual 👇👇
-    float fenya=(average/1023)*5; 
-    float r=(5-fenya)/fenya*4700; // Calculate the resistance of the thermistor
-    
-    temperature_analog_temp_sensor = (1/( log(r/10000) /3950 + 1/(25+273.15))-273.15); // Convert to Celsius using the Steinhart-Hart equation
 }
 
-
 void sensors::read_humidity() {
-    if (dht11_pin == -1) {
-        Serial.println("Humidity pin not set. Cannot read humidity.");
-        return;
+    if (humidity_sensor) {
+        humidity_sensor->read();
     }
-    dht11_sensor.read(dht11_pin);
-    humidity = dht11_sensor.humidity;
 }
 
 void sensors::read_light() {
-    if (light_pin == -1) {
-        Serial.println("Light pin not set. Cannot read light.");
-        return;
+    if (light_sensor) {
+        light_sensor->read();
     }
-    light = analogRead(light_pin); // Read light level from analog pin
 }
 
 void sensors::read_gas() {
-    if (gas_pin == -1) {
-        Serial.println("Gas pin not set. Cannot read gas level.");
-        return;
+    if (gas_sensor) {
+        gas_sensor->read();
     }
-    gas = analogRead(gas_pin); // Read gas level from analog pin
-    if(gas > 300) { // You can adjust this threshold
-        Serial.println("Gas Detected!");
-    } else {
-        Serial.println("No Gas Detected.");
+}
+
+// Backward compatible getter methods
+float sensors::get_temperature_dht11() const {
+    return dht11_temp_sensor ? dht11_temp_sensor->getValue() : 0.0;
+}
+
+float sensors::get_temperature_linear_temp_sensor() const {
+    return linear_temp_sensor ? linear_temp_sensor->getValue() : 0.0;
+}
+
+float sensors::get_temperature_analog_temp_sensor() const {
+    return analog_temp_sensor ? analog_temp_sensor->getValue() : 0.0;
+}
+
+float sensors::get_humidity() const {
+    return humidity_sensor ? humidity_sensor->getValue() : 0.0;
+}
+
+float sensors::get_light() const {
+    return light_sensor ? light_sensor->getValue() : 0.0;
+}
+
+float sensors::get_gas() const {
+    return gas_sensor ? gas_sensor->getValue() : 0.0;
+}
+
+std::vector<float> sensors::get_all_temperatures() const {
+    return {get_temperature_dht11(), get_temperature_linear_temp_sensor(), get_temperature_analog_temp_sensor()};
+}
+
+float sensors::get_average_temperature() const {
+    float sum = get_temperature_dht11() + get_temperature_linear_temp_sensor() + get_temperature_analog_temp_sensor();
+    return sum / 3.0;
+}
+
+// New polymorphic interface methods
+std::vector<Sensor*> sensors::getAllSensors() const {
+    std::vector<Sensor*> sensorList;
+    if (dht11_temp_sensor) sensorList.push_back(dht11_temp_sensor.get());
+    if (linear_temp_sensor) sensorList.push_back(linear_temp_sensor.get());
+    if (analog_temp_sensor) sensorList.push_back(analog_temp_sensor.get());
+    if (humidity_sensor) sensorList.push_back(humidity_sensor.get());
+    if (light_sensor) sensorList.push_back(light_sensor.get());
+    if (gas_sensor) sensorList.push_back(gas_sensor.get());
+    return sensorList;
+}
+
+void sensors::readAllSensors() {
+    auto sensorList = getAllSensors();
+    for (auto sensor : sensorList) {
+        sensor->read();
     }
 }
