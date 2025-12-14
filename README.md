@@ -1,6 +1,7 @@
 # Environment Monitor with LCD and Tilt-Controlled Mode Switching
 
-This project is an Arduino-based environment monitoring system. The final goal is to display environmental data on an LCD screen and allow users to switch between different display or operation modes by tilting the device, using an onboard accelerometer for intuitive, button-free control.
+This project is an Arduino-based environment monitoring system. The final goal is to display environmental data on an LCD screen and allow users to switch between different display or operation modes by tilting the device, using an onboard accelerometer for intuitive, button-free control [project photos](https://github.com/KelennaUdo/Environment-monitor-with-LCD-and-tilt-controlled-mode-switching/blob/main/project%20photo.jpg)
+.
 
 ## Current Status
 
