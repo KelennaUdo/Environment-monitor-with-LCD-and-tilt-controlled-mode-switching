@@ -22,7 +22,7 @@ platformio.ini
 # Allow only these tracked items
 !src/
 !src/**
-!LICENSE
+!LICENSE.txt
 !README.md
-!project_photo.jpg
+!project photo.jpg
 !.gitignore
