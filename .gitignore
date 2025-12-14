@@ -1,0 +1,28 @@
+
+
+# Ignore PlatformIO and editor files
+.pio/
+.vscode/
+
+# Ignore build/support folders
+include/
+lib/
+test/
+
+# Ignore PlatformIO config (optional – include only if you truly don't want it tracked)
+platformio.ini
+
+# Ignore archives
+*.tar
+*.zip
+
+# Ignore everything by default
+*
+
+# Allow only these tracked items
+!src/
+!src/**
+!LICENSE
+!README.md
+!project_photo.jpg
+!.gitignore
